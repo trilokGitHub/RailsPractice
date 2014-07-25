@@ -1,0 +1,116 @@
+<script type="text/javascript" >
+    $(function() {
+        $("#blogAnalyserform").submit(function(e) {
+            var selectFrom = $("#selectFrom").val();
+            var selectTo = $("#selectTo").val();
+            var interval = $("#interval").val();
+
+            var dataString = 'selectFrom=' + selectFrom + 'selectTo=' + selectTo + 'interval=' + interval;
+            alert(dataString);
+
+            if (selectFrom == '' || selectTo == '' || interval == '') {
+                $('.success').fadeOut(200).hide();
+                $('.error').fadeOut(200).show();
+            }
+            else {
+                google.load("visualization", "1", {packages:["corechart"]});
+                options_line = {
+                    'width': 700,
+                    'height': 600,
+                    pointShape: 'diamond',
+                    pointSize: 10,
+                    colors: ['#71b37c'],
+                    legend: { position: 'top', maxLines: 3 },
+                    hAxis: {
+                        title: "Date",
+                        slantedText: true,
+                        slantedTextAngle: 30,
+                        gridlines: {
+                            count: 200
+                        }
+                    },
+                    vAxis: {
+                        title: 'Counts'
+                    }
+                };
+                google.setOnLoadCallback(drawChart);
+                doCharts('<%= @article.id.to_s %>');
+            }
+            return false;
+        });
+    });
+</script>
+
+
+<div id="articleDetail">
+    <p>
+      <strong>Name:</strong>
+      <%= @article.name %>
+    </p>
+
+    <p>
+      <strong>Content:</strong>
+      <%= @article.content %>
+    </p>
+
+    <p>
+      <strong>Created By:</strong>
+      <%= @article.created_by %>
+    </p>
+
+    <p>
+      <strong>Time:</strong>
+      <%= @article.time %>
+    </p>
+
+    <%= link_to 'Edit', edit_article_path(@article), :class => "small button" %>
+</div>
+
+
+<div class="left" id="commentDetails">
+    <p>
+    Total comments : <%= @article.comments.count  %>
+
+    <% if  @article.comments.count > 0 %>
+        <h2>Comments</h2>
+        <table :style width="400px">
+        <tr>
+          <td><b> Name </b></td>
+          <td><b> Comment </b></td>
+          <td><b> CreatedBy </b></td>
+          <td><b> Time </b></td>
+          <td><b> Delete </b></td>
+         </tr>
+        <% for comment in @article.comments %>
+            <tr>
+              <td><%= comment.name %></td>
+              <td><%= comment.content %></td>
+              <td><%= comment.created_by %></td>
+              <td><%= comment.time.strftime("%m/%d/%Y %I:%M %p") %></td>
+             <td><%= link_to 'X', destroy_comment_path(@article,comment),:method => :delete, :class => "tiny button" %></td>
+            </tr>
+        <% end %>
+        </table>
+    <% end %>
+    </p>
+</div>
+
+<div class="large-5 columns right">
+    <div id="newComment">
+        <h2>New Comment</h2>
+
+        <div class="fields">
+            <%= form_for [@article, Comment.new] do |f| %>
+                <p><%= f.label :name %> <%= f.text_field :name %></p>
+                <p><%= f.text_area :content, :rows => 10 %></p>
+                <p><%= f.submit class: "button tiny radius" %></p>
+            <% end %>
+        </div>
+    </div>
+</div>
+
+
+<%= render '/analysis/form2' %>
+
+<div class="right" id="chart_div" style="width: 700px; height: 600px;"></div>
+

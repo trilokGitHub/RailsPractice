@@ -1,0 +1,21 @@
+<h1>Listing articles</h1>
+
+<div class="large-12 columns">
+  Total articles : <%= Article.count  %>
+    <table>
+      <tbody>
+      <% @articles.each do |article| %>
+          <tr>
+            <td><%= link_to "#{article.name}", article_path(article) %></td>
+            <td><%= link_to 'Edit', edit_article_path(article) %></td>
+            <td><%= link_to 'X', destroy_article_path(article),:method => :delete %></td>
+            <td><%= "#{article.created_by}" %></td>
+            <td><%= "#{article.time}" %></td>
+          </tr>
+      <% end %>
+      </tbody>
+    </table>
+</div>
+
+
+<%= link_to 'New Article', new_article_path, :class => "small button" %>
